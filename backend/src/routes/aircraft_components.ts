@@ -1,0 +1,64 @@
+import { Router } from 'express';
+import { PrismaClient } from '@prisma/client';
+
+const router = Router();
+const prisma = new PrismaClient();
+
+// Get components for an aircraft
+router.get('/:aircraftId', async (req, res) => {
+    try {
+        const components = await prisma.aircraftComponent.findMany({
+            where: { aircraft_id: req.params.aircraftId }
+        });
+        res.json(components);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch aircraft components' });
+    }
+});
+
+// Create aircraft components (supports single or bulk insert)
+router.post('/', async (req, res) => {
+    try {
+        const body = req.body;
+        // Check if array (bulk insert)
+        if (Array.isArray(body)) {
+            // Prisma createMany
+            const result = await prisma.aircraftComponent.createMany({
+                data: body.map(item => ({
+                    aircraft_id: item.aircraft_id,
+                    section: item.section,
+                    manufacturer: item.manufacturer,
+                    model: item.model,
+                    serial_number: item.serial_number,
+                    part_number: item.part_number,
+                    // handle dates and numbers
+                    last_shop_visit_date: item.last_shop_visit_date ? new Date(item.last_shop_visit_date) : null,
+                    hours_since_new: item.hours_since_new ? Number(item.hours_since_new) : 0,
+                    cycles_since_new: item.cycles_since_new ? Number(item.cycles_since_new) : 0,
+                }))
+            });
+            res.json(result);
+        } else {
+            // Single insert
+            const result = await prisma.aircraftComponent.create({
+                data: {
+                    aircraft_id: body.aircraft_id,
+                    section: body.section,
+                    manufacturer: body.manufacturer,
+                    model: body.model,
+                    serial_number: body.serial_number,
+                    part_number: body.part_number,
+                    last_shop_visit_date: body.last_shop_visit_date ? new Date(body.last_shop_visit_date) : null,
+                    hours_since_new: body.hours_since_new ? Number(body.hours_since_new) : 0,
+                    cycles_since_new: body.cycles_since_new ? Number(body.cycles_since_new) : 0,
+                }
+            });
+            res.json(result);
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to create aircraft components' });
+    }
+});
+
+export default router;

@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password_hash  String
+  full_name      String?
+  avatar_url     String?
+  role           String    @default("user")
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  
+  aircrafts      Aircraft[]
+}
+
+model Aircraft {
+  id                 String               @id @default(uuid())
+  model              String
+  msn                String
+  registration_number String
+  country            String?
+  manufacture_date   DateTime?
+  delivery_date      DateTime?
+  flight_hours       Float              @default(0)
+  flight_cycles      Float              @default(0)
+  engines_count      Int                @default(2)
+  status             String             @default("Active")
+  user_id            String
+  
+  user               User               @relation(fields: [user_id], references: [id])
+  components         AircraftComponent[]
+  
+  created_at         DateTime           @default(now())
+  updated_at         DateTime           @updatedAt
+}
+
+model AircraftComponent {
+  id                  String    @id @default(uuid())
+  aircraft_id         String
+  section             String
+  manufacturer        String?
+  model               String?
+  serial_number       String?
+  part_number         String?
+  last_shop_visit_date DateTime?
+  hours_since_new     Float?
+  cycles_since_new    Float?
+  
+  aircraft            Aircraft  @relation(fields: [aircraft_id], references: [id])
+  
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+}
+
+model Component {
+  id                        String    @id @default(uuid())
+  manufacturer              String
+  name                      String
+  part_number               String
+  cmm_number                String?
+  classification            String?
+  classification_date       DateTime?
+  class_linkage             String?
+  compatible_aircraft_models String[]
+  estimated_price           Float?
+  quotation_price           Float?
+  
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+}
+
+model Service {
+  id                    String    @id @default(uuid())
+  aircraft_model        String
+  task_name             String
+  mpd_amm_task_ids      String?
+  task_card_ref         String?
+  description           String?
+  assigned_component_id String?
+  zones                 String[]
+  estimated_manhours    Float?
+  estimated_price       Float?
+  quotation_price       Float?
+  interval_threshold    Float?
+  repeat_interval       Float?
+  
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+}
