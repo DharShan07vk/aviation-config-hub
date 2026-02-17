@@ -2,14 +2,15 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 router.get('/', async (req, res) => {
     try {
         const services = await prisma.service.findMany();
         res.json(services);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch services' });
+        console.error("Error fetching services:", error);
+        res.status(500).json({ error: 'Failed to fetch services', details: (error as Error).message });
     }
 });
 
@@ -49,7 +50,8 @@ router.post('/', async (req, res) => {
         res.json(service);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to create service' });
+        console.error("Error creating service:", error);
+        res.status(500).json({ error: 'Failed to create service', details: (error as Error).message });
     }
 });
 

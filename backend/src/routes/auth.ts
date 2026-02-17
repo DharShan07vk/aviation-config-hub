@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 router.post('/register', async (req, res) => {
     const { email, password, full_name, role } = req.body;
@@ -31,7 +31,8 @@ router.post('/register', async (req, res) => {
             token
         });
     } catch (e) {
-        res.status(400).json({ error: 'User already exists or check input' });
+        console.error("Register error:", e);
+        res.status(400).json({ error: 'User already exists or check input', details: (e as Error).message });
     }
 });
 
@@ -52,7 +53,8 @@ router.post('/login', async (req, res) => {
             token
         });
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+        console.error("Login error:", error);
+        res.status(500).json({ error: 'Internal server error', details: (error as Error).message });
     }
 });
 

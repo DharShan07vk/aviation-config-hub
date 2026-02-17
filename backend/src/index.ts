@@ -10,7 +10,7 @@ import serviceRoutes from './routes/services';
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
+import prisma from './lib/prisma';
 
 app.use(cors());
 app.use(express.json());

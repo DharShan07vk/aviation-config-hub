@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // Get components for an aircraft
 router.get('/:aircraftId', async (req, res) => {
@@ -12,7 +12,8 @@ router.get('/:aircraftId', async (req, res) => {
         });
         res.json(components);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch aircraft components' });
+        console.error("Error fetching aircraft components:", error);
+        res.status(500).json({ error: 'Failed to fetch aircraft components', details: (error as Error).message });
     }
 });
 
@@ -57,7 +58,8 @@ router.post('/', async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to create aircraft components' });
+        console.error("Error creating aircraft components:", error);
+        res.status(500).json({ error: 'Failed to create aircraft components', details: (error as Error).message });
     }
 });
 

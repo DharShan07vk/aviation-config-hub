@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // Get all components (catalogue)
 router.get('/', async (req, res) => {
@@ -10,7 +10,8 @@ router.get('/', async (req, res) => {
         const components = await prisma.component.findMany();
         res.json(components);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch components' });
+        console.error("Error fetching components:", error);
+        res.status(500).json({ error: 'Failed to fetch components', details: (error as Error).message });
     }
 });
 
@@ -40,7 +41,8 @@ router.post('/', async (req, res) => {
 
         res.json(component);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create component' });
+        console.error("Error creating component:", error);
+        res.status(500).json({ error: 'Failed to create component', details: (error as Error).message });
     }
 });
 

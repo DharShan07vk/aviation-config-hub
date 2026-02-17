@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma';
 
 // Get all aircrafts for the authenticated user
 router.get('/', authenticateToken, async (req, res) => {
@@ -20,7 +20,8 @@ router.get('/', authenticateToken, async (req, res) => {
         res.json(aircrafts);
     } catch (error) {
         console.error("Error fetching aircrafts:", error);
-        res.status(500).json({ error: 'Failed to fetch aircrafts' });
+        console.error("Error fetching aircrafts:", error);
+        res.status(500).json({ error: 'Failed to fetch aircrafts', details: (error as Error).message });
     }
 });
 
@@ -52,7 +53,8 @@ router.post('/', authenticateToken, async (req, res) => {
         });
         res.json(aircraft);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create aircraft' });
+        console.error("Error creating aircraft:", error);
+        res.status(500).json({ error: 'Failed to create aircraft', details: (error as Error).message });
     }
 });
 
