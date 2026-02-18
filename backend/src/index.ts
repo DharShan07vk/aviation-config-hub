@@ -20,8 +20,11 @@ app.use(cors({
         'https://aviation-config-hub-9y2x.vercel.app',
         'https://aviation-config-hub-9y2x-kkv3w4db9-vishveshwaran-as-projects.vercel.app'
     ],
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
+
+app.options('*', cors());
 app.use(express.json());
 
 // Main Routes
