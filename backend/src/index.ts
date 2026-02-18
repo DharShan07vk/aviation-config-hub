@@ -16,7 +16,7 @@ app.use(cors({
     origin: [
         'http://localhost:5173',
         'http://localhost:3000',
-        'https://aviation-config-hub-9y2x.vercel.app/'
+        'https://aviation-config-hub.vercel.app'
     ],
     credentials: true
 }));
@@ -33,7 +33,7 @@ import aircraftComponentRoutes from './routes/aircraft_components';
 app.use('/api/services', serviceRoutes);
 app.use('/api/aircraft_components', aircraftComponentRoutes);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(`Backend server running on http://localhost:${PORT}`);
