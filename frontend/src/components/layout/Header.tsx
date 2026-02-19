@@ -24,8 +24,12 @@ const Header = () => {
     i18n.changeLanguage(lng);
   };
 
+
   useEffect(() => {
-    const timer = setInterval(() => setDateTime(new Date()), 60000);
+    const timer = setInterval(() => {
+      setDateTime(new Date());
+    }, 1000);
+
     return () => clearInterval(timer);
   }, []);
 
@@ -71,36 +75,36 @@ const Header = () => {
       </div>
 
       <div className="flex items-center gap-4">
+        <span className="hidden text-sm text-muted-foreground md:inline">
+          {format(dateTime, "MM/dd/yyyy, hh:mm:ss a")}
+        </span>
         {/* Language Switcher */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="w-9 h-9">
-              <span className="text-xl">
-                {i18n.language === 'en' && '🇲🇾'}
-                {i18n.language === 'es' && '🇪🇸'}
-                {i18n.language === 'de' && '🇩🇪'}
-                {i18n.language === 'ru' && '🇷🇺'}
-                {i18n.language === 'it' && '🇮🇹'}
-                {/* Fallback */}
-                {!['en', 'es', 'de', 'ru', 'it'].includes(i18n.language) && '🌐'}
-              </span>
+              <span className={`fi text-xl ${i18n.language === 'en' ? 'fi-my' :
+                i18n.language === 'es' ? 'fi-es' :
+                  i18n.language === 'de' ? 'fi-de' :
+                    i18n.language === 'ru' ? 'fi-ru' :
+                      i18n.language === 'it' ? 'fi-it' : 'fi-un'
+                }`} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => changeLanguage('en')}>
-              <span className="mr-2">🇲🇾</span> English (Malaysia)
+              <span className="mr-2 fi fi-my"></span> English (Malaysia)
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => changeLanguage('es')}>
-              <span className="mr-2">🇪🇸</span> Espagnol
+              <span className="mr-2 fi fi-es"></span> Espagnol
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => changeLanguage('de')}>
-              <span className="mr-2">🇩🇪</span> Deutsch
+              <span className="mr-2 fi fi-de"></span> Deutsch
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => changeLanguage('ru')}>
-              <span className="mr-2">🇷🇺</span> Russian
+              <span className="mr-2 fi fi-ru"></span> Russian
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => changeLanguage('it')}>
-              <span className="mr-2">🇮🇹</span> Italian
+              <span className="mr-2 fi fi-it"></span> Italian
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -116,9 +120,7 @@ const Header = () => {
             <Maximize className="h-5 w-5" />
           )}
         </button>
-        <span className="hidden text-sm text-muted-foreground md:inline">
-          {format(dateTime, "dd MMM yyyy, HH:mm")}
-        </span>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="h-8 w-8 cursor-pointer">
