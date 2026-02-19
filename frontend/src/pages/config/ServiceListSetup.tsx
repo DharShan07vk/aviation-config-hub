@@ -98,7 +98,7 @@ const ServiceListSetup = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setIsCreating(true)}>
+          <Button className="bg-[#556ee6] hover:bg-[#556ee6]-700 text-white" onClick={() => setIsCreating(true)}>
             <Plus className="mr-2 h-4 w-4" /> Create New
           </Button>
         </div>

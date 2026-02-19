@@ -27,7 +27,7 @@ export const aircraftSchema = z.object({
     flight_hours: z.coerce.number().min(0),
     flight_cycles: z.coerce.number().min(0),
     engines_count: z.coerce.number().min(1),
-    status: z.enum(["Active", "Inactive", "Maintenance", "Storage"]).default("Active"),
+    status: z.enum(["Active", "Inactive", "Maintenance", "Storage", "Pending", "Declined"]).default("Pending"),
 
     // Section B: APU Details
     apu_manufacturer: optionalString,

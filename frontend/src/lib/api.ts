@@ -55,6 +55,15 @@ export const api = {
         list: async () => {
             const res = await fetch(`${API_URL}/aircrafts`, { headers: getHeaders() });
             return res.json();
+        },
+        update: async (id: string, data: any) => {
+            const res = await fetch(`${API_URL}/aircrafts/${id}`, {
+                method: 'PATCH',
+                headers: getHeaders(),
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw await res.json();
+            return res.json();
         }
     },
     components: {

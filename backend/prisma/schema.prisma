@@ -31,7 +31,7 @@ model Aircraft {
   flight_hours       Float              @default(0)
   flight_cycles      Float              @default(0)
   engines_count      Int                @default(2)
-  status             String             @default("Active")
+  status             String             @default("Pending")
   user_id            String
   
   user               User               @relation(fields: [user_id], references: [id])

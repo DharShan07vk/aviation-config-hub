@@ -35,7 +35,7 @@ export function AircraftForm() {
     const form = useForm<AircraftFormData>({
         resolver: zodResolver(aircraftSchema),
         defaultValues: {
-            status: "Active",
+            status: "Pending",
             engines_count: 2,
         },
     });
@@ -271,7 +271,7 @@ export function AircraftForm() {
                                 </FormItem>
                             )}
                         />
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="status"
                             render={({ field }) => (
@@ -293,7 +293,7 @@ export function AircraftForm() {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                     </div>
                 </div>
 

@@ -3,7 +3,7 @@ import { AircraftForm } from "@/components/config/AircraftForm";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, ThumbsUp, ThumbsDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -19,6 +19,7 @@ export interface Aircraft {
   msn: string;
   registration_number: string;
   engines_count: number;
+  status?: string;
   [key: string]: any;
 }
 
@@ -54,6 +55,16 @@ const AircraftSetup = () => {
       fetchData();
     }
   }, [isCreating]);
+
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    try {
+      await api.aircrafts.update(id, { status: newStatus });
+      // Update local state
+      setData(data.map(item => item.id === id ? { ...item, status: newStatus } : item));
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
 
   const filteredData = data.filter((item) =>
     Object.values(item).some((val) =>
@@ -100,7 +111,7 @@ const AircraftSetup = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setIsCreating(true)}>
+          <Button className="bg-[#556ee6] hover:bg-[#556ee6]-700 text-white" onClick={() => setIsCreating(true)}>
             <Plus className="mr-2 h-4 w-4" /> Create New
           </Button>
         </div>
@@ -115,19 +126,20 @@ const AircraftSetup = () => {
                 <TableHead>MSN</TableHead>
                 <TableHead>National Reg ID</TableHead>
                 <TableHead>No of Engines</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : filteredData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
                     No results found.
                   </TableCell>
                 </TableRow>
@@ -140,8 +152,33 @@ const AircraftSetup = () => {
                     <TableCell>{item.msn}</TableCell>
                     <TableCell>{item.registration_number}</TableCell>
                     <TableCell>{item.engines_count}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${item.status === 'Active' ? 'bg-green-100 text-green-800' :
+                          item.status === 'Declined' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                        {item.status || 'Pending'}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          onClick={() => handleStatusUpdate(item.id, 'Active')}
+                          title="Approve"
+                        >
+                          <ThumbsUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-orange-500 hover:text-orange-600 hover:bg-orange-50"
+                          onClick={() => handleStatusUpdate(item.id, 'Declined')}
+                          title="Decline"
+                        >
+                          <ThumbsDown className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500">
                           <Pencil className="h-4 w-4" />
                         </Button>

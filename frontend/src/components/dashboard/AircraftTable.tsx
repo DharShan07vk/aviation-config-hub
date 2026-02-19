@@ -59,6 +59,7 @@ export function AircraftTable() {
     };
 
     const filteredData = data.filter((item) =>
+        item.status === 'Active' &&
         Object.values(item).some(
             (value) =>
                 value &&

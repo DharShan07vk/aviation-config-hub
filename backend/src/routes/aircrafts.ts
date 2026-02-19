@@ -58,4 +58,37 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
+// Update aircraft
+router.patch('/:id', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            model, msn, registration_number, manufacture_date, delivery_date,
+            flight_hours, flight_cycles, engines_count, status, country
+        } = req.body;
+
+        const userId = (req as any).user.userId;
+
+        const aircraft = await prisma.aircraft.update({
+            where: { id: id, user_id: userId },
+            data: {
+                model,
+                msn,
+                registration_number,
+                manufacture_date: manufacture_date ? new Date(manufacture_date) : undefined,
+                delivery_date: delivery_date ? new Date(delivery_date) : undefined,
+                flight_hours: flight_hours !== undefined ? Number(flight_hours) : undefined,
+                flight_cycles: flight_cycles !== undefined ? Number(flight_cycles) : undefined,
+                engines_count: engines_count !== undefined ? Number(engines_count) : undefined,
+                status,
+                country
+            }
+        });
+        res.json(aircraft);
+    } catch (error) {
+        console.error("Error updating aircraft:", error);
+        res.status(500).json({ error: 'Failed to update aircraft', details: (error as Error).message });
+    }
+});
+
 export default router;

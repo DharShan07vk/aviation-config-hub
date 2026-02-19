@@ -15,7 +15,7 @@ import prisma from './lib/prisma';
 app.use(cors({
     origin: true, // dynamic allow all
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
 }));
 
 app.options('*', cors());
