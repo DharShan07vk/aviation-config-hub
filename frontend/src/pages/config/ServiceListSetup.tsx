@@ -83,7 +83,7 @@ const ServiceListSetup = () => {
   return (
     <div className="space-y-6 pb-10">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight uppercase text-gray-800">SERVICE LIST SETUP</h2>
+        <h2 className="text-2xl font-bold tracking-tight uppercase text-[#343a40]">SERVICE LIST SETUP</h2>
         <div className="text-sm text-muted-foreground">Configuration / Service List Setup</div>
       </div>
 
