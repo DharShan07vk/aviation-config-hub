@@ -29,7 +29,6 @@ interface Panel {
   label: string;
   sublabel: string;
   icon: React.ElementType;
-  status: "active" | "locked";
   href?: string; // relative href; :id will be replaced
 }
 
@@ -39,7 +38,6 @@ const PANELS: Panel[] = [
     label: "OCCM Panel",
     sublabel: "On-condition component management",
     icon: ClipboardList,
-    status: "active",
     href: "/aircraft/:id/occm",
   },
   {
@@ -47,43 +45,37 @@ const PANELS: Panel[] = [
     label: "Journey Log",
     sublabel: "Flight journey records & logs",
     icon: Plane,
-    status: "active",
     href: "/aircraft/:id/journey",
   },
   {
     id: "S3",
-    label: "Maintenance Log",
+    label: "Panel S3",
     sublabel: "Scheduled & unscheduled maintenance",
     icon: Wrench,
-    status: "locked",
   },
   {
     id: "S4",
-    label: "Technical Records",
+    label: "Panel S4",
     sublabel: "Airframe technical record summary",
     icon: FileText,
-    status: "locked",
   },
   {
     id: "S5",
-    label: "Documentation",
+    label: "Panel S5",
     sublabel: "Manuals, forms and references",
     icon: BookOpen,
-    status: "locked",
   },
   {
     id: "S6",
-    label: "Stores",
+    label: "Panel S6",
     sublabel: "Consumables and rotable tracking",
     icon: Package,
-    status: "locked",
   },
   {
     id: "S7",
     label: "Forecast",
     sublabel: "Predictive maintenance planning",
     icon: TrendingUp,
-    status: "active",
     href: "/aircraft/:id",
   },
 ];
@@ -93,9 +85,8 @@ for (let i = 8; i <= 30; i++) {
   PANELS.push({
     id: `S${i}`,
     label: `Panel S${i}`,
-    sublabel: "Module in development",
+    sublabel: "",
     icon: Lock,
-    status: "locked",
   });
 }
 
@@ -165,7 +156,7 @@ const AircraftActivity = () => {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {PANELS.map((panel) => {
           const Icon = panel.icon;
-          const isActive = panel.status === "active";
+          const isActive = true;
 
           return (
             <button
