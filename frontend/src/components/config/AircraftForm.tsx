@@ -299,8 +299,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                     {TextField("confirm_apu_part_number", "Re-Enter Part Number")}
                     {TextField("apu_last_shop_visit", "APU Last Shop Visit", "DD/MM/YYYY", "date")}
                     {TextField("apu_hours", "APU Total Hours", "HHHH-MM", "number", "0.01")}
-                    {TextField("apu_cycles", "APU Total Cycles", "", "number")}
-                    <div />
+                    <div className="col-span-2">{TextField("apu_cycles", "APU Total Cycles", "", "number")}</div>
 
                     {/* ── Main Landing Gear — Left ──────────────────── */}
                     <SectionTitle title="Main Landing Gear — Left" />
@@ -342,8 +341,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                     {TextField("confirm_mlg_left_part_number", "Re-Enter Part Number")}
                     {TextField("mlg_left_shop_visit", "Last Shop Visit", "DD/MM/YYYY", "date")}
                     {TextField("mlg_left_hours", "Total Hours", "HHHH-MM", "number", "0.01")}
-                    {TextField("mlg_left_cycles", "Total Cycles", "", "number")}
-                    <div />
+                    <div className="col-span-2">{TextField("mlg_left_cycles", "Total Cycles", "", "number")}</div>
 
                     {/* ── Main Landing Gear — Right ─────────────────── */}
                     <SectionTitle title="Main Landing Gear — Right" />
@@ -385,8 +383,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                     {TextField("confirm_mlg_right_part_number", "Re-Enter Part Number")}
                     {TextField("mlg_right_shop_visit", "Last Shop Visit", "DD/MM/YYYY", "date")}
                     {TextField("mlg_right_hours", "Total Hours", "HHHH-MM", "number", "0.01")}
-                    {TextField("mlg_right_cycles", "Total Cycles", "", "number")}
-                    <div />
+                    <div className="col-span-2">{TextField("mlg_right_cycles", "Total Cycles", "", "number")}</div>
 
                     {/* ── Nose Landing Gear ────────────────────────── */}
                     <SectionTitle title="Nose Landing Gear" />
@@ -428,8 +425,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                     {TextField("confirm_nlg_part_number", "Re-Enter Part Number")}
                     {TextField("nlg_shop_visit", "Last Shop Visit", "DD/MM/YYYY", "date")}
                     {TextField("nlg_hours", "Total Hours", "HHHH-MM", "number", "0.01")}
-                    {TextField("nlg_cycles", "Total Cycles", "", "number")}
-                    <div />
+                    <div className="col-span-2">{TextField("nlg_cycles", "Total Cycles", "", "number")}</div>
 
                 </div>
 
