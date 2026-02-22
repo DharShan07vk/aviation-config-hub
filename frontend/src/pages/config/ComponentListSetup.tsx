@@ -85,16 +85,16 @@ const ComponentListSetup = () => {
       <div className="w-full pb-10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">
-              {editingItem ? "Edit Component" : "Add New Component"}
+            <h2 className="text-2xl font-bold tracking-tight text-[#343a40] uppercase text-xl">
+              {editingItem ? "Edit Component" : "COMPONENT LIST SETUP"}
             </h2>
-            <p className="text-muted-foreground text-sm mt-1">Add components to the catalog.</p>
+            {/* <p className="text-muted-foreground text-sm mt-1">Add components to the catalog.</p> */}
           </div>
           <Button variant="outline" onClick={() => { setIsCreating(false); setEditingItem(null); }}>
             ← Back to List
           </Button>
         </div>
-        <div className="border rounded-lg p-6 bg-card text-card-foreground shadow-sm">
+        <div className="border rounded-lg p-6 bg-card text-card-foreground shadow-sm max-w-7xl mx-auto">
           <ComponentForm
             defaultValues={editingItem ?? undefined}
             onSuccess={() => { setIsCreating(false); setEditingItem(null); fetchData(); }}
