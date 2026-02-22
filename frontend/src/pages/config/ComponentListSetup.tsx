@@ -3,6 +3,7 @@ import { ComponentForm } from "@/components/config/ComponentForm";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -29,6 +30,7 @@ const ComponentListSetup = () => {
   const [data, setData] = useState<ComponentItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -55,21 +57,20 @@ const ComponentListSetup = () => {
     }
   }, [isCreating, editingItem]);
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to delete component "${name}"?`)) return;
+  const handleDelete = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/components/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
-      if (res.ok) {
-        setData(data.filter(item => item.id !== id));
-        toast.success("Component deleted");
-      } else {
-        toast.error("Failed to delete component");
-      }
+      await api.components.delete(deleteTarget.id);
+      setData(prev => prev.filter(item => item.id !== deleteTarget.id));
+      toast.success("Component deleted");
     } catch {
       toast.error("Failed to delete component");
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -110,6 +111,15 @@ const ComponentListSetup = () => {
         <div className="text-sm text-muted-foreground">Configuration / Component List Setup</div>
       </div>
 
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Component"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
       <div className="bg-white border rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div className="relative w-72">
@@ -130,12 +140,12 @@ const ComponentListSetup = () => {
           <Table>
             <TableHeader className="bg-gray-50">
               <TableRow>
-                <TableHead className="w-[50px]"><input type="checkbox" className="translate-y-[2px]" /></TableHead>
                 <TableHead className="w-[50px]">#</TableHead>
+                <TableHead>Aircraft Model</TableHead>
                 <TableHead>Component Name</TableHead>
-                <TableHead>Manufacturer</TableHead>
-                <TableHead>Part Number</TableHead>
-                <TableHead>CMM Number</TableHead>
+                <TableHead>Component Part No</TableHead>
+                <TableHead>Component Class</TableHead>
+                <TableHead>Class Linkage</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -151,12 +161,12 @@ const ComponentListSetup = () => {
               ) : (
                 filteredData.map((item, index) => (
                   <TableRow key={item.id || index}>
-                    <TableCell><input type="checkbox" className="translate-y-[2px]" /></TableCell>
                     <TableCell>{index + 1}</TableCell>
+                    <TableCell>{Array.isArray(item.compatible_aircraft_models) ? item.compatible_aircraft_models.join(", ") : (item.compatible_aircraft_models || '-')}</TableCell>
                     <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.manufacturer}</TableCell>
                     <TableCell>{item.part_number}</TableCell>
-                    <TableCell>{item.cmm_number || '-'}</TableCell>
+                    <TableCell>{item.classification || '-'}</TableCell>
+                    <TableCell>{item.class_linkage || '-'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button

@@ -55,4 +55,18 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Delete service
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const existing = await prisma.service.findUnique({ where: { id } });
+        if (!existing) return res.status(404).json({ error: 'Service not found' });
+        await prisma.service.delete({ where: { id } });
+        res.status(204).send();
+    } catch (error) {
+        console.error("Error deleting service:", error);
+        res.status(500).json({ error: 'Failed to delete service', details: (error as Error).message });
+    }
+});
+
 export default router;

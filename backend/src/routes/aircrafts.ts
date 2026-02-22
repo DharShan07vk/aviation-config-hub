@@ -116,4 +116,30 @@ router.patch('/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// Delete aircraft
+router.delete('/:id', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = (req as any).user.userId;
+
+        // Verify aircraft belongs to this user
+        const existing = await prisma.aircraft.findFirst({
+            where: { id, user_id: userId }
+        });
+        if (!existing) {
+            return res.status(404).json({ error: 'Aircraft not found' });
+        }
+
+        // Delete related components first (FK cascade safety)
+        await prisma.aircraftComponent.deleteMany({ where: { aircraft_id: id } });
+
+        await prisma.aircraft.delete({ where: { id } });
+
+        res.status(204).send();
+    } catch (error) {
+        console.error("Error deleting aircraft:", error);
+        res.status(500).json({ error: 'Failed to delete aircraft', details: (error as Error).message });
+    }
+});
+
 export default router;

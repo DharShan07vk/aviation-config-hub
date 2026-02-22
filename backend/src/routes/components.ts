@@ -46,4 +46,18 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Delete component
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const existing = await prisma.component.findUnique({ where: { id } });
+        if (!existing) return res.status(404).json({ error: 'Component not found' });
+        await prisma.component.delete({ where: { id } });
+        res.status(204).send();
+    } catch (error) {
+        console.error("Error deleting component:", error);
+        res.status(500).json({ error: 'Failed to delete component', details: (error as Error).message });
+    }
+});
+
 export default router;

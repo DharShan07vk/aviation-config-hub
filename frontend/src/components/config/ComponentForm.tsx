@@ -291,57 +291,68 @@ export function ComponentForm({ defaultValues, onSuccess }: ComponentFormProps) 
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="currency"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Currency</FormLabel>
-                                <div className="col-span-3">
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select currency" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="MYR">MYR</SelectItem>
-                                            <SelectItem value="USD">USD</SelectItem>
-                                            <SelectItem value="EUR">EUR</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
+
+                    {/* Estimated Price with inline currency */}
                     <FormField
                         control={form.control}
                         name="estimated_price"
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                                 <FormLabel className="text-right">Estimated Price</FormLabel>
-                                <div className="col-span-3">
+                                <div className="col-span-3 flex gap-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="currency"
+                                        render={({ field: cf }) => (
+                                            <Select onValueChange={cf.onChange} value={cf.value}>
+                                                <SelectTrigger className="w-24 shrink-0">
+                                                    <SelectValue placeholder="CCY" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="MYR">MYR</SelectItem>
+                                                    <SelectItem value="USD">USD</SelectItem>
+                                                    <SelectItem value="EUR">EUR</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    />
                                     <FormControl>
-                                        <Input type="number" step="0.01" {...field} />
+                                        <Input type="number" step="0.01" className="flex-1" {...field} />
                                     </FormControl>
-                                    <FormMessage />
                                 </div>
+                                <div className="col-start-2 col-span-3"><FormMessage /></div>
                             </FormItem>
                         )}
                     />
+                    {/* Quotation Price with inline currency (reads same currency field) */}
                     <FormField
                         control={form.control}
                         name="quotation_price"
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
                                 <FormLabel className="text-right">Quotation Price</FormLabel>
-                                <div className="col-span-3">
+                                <div className="col-span-3 flex gap-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="currency"
+                                        render={({ field: cf }) => (
+                                            <Select onValueChange={cf.onChange} value={cf.value}>
+                                                <SelectTrigger className="w-24 shrink-0">
+                                                    <SelectValue placeholder="CCY" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="MYR">MYR</SelectItem>
+                                                    <SelectItem value="USD">USD</SelectItem>
+                                                    <SelectItem value="EUR">EUR</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    />
                                     <FormControl>
-                                        <Input type="number" step="0.01" {...field} />
+                                        <Input type="number" step="0.01" className="flex-1" {...field} />
                                     </FormControl>
-                                    <FormMessage />
                                 </div>
+                                <div className="col-start-2 col-span-3"><FormMessage /></div>
                             </FormItem>
                         )}
                     />

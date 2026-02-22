@@ -3,6 +3,7 @@ import { AircraftForm } from "@/components/config/AircraftForm";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Plus, Search, Pencil, Trash2, ThumbsUp, ThumbsDown } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -33,6 +34,7 @@ const AircraftSetup = () => {
   const [data, setData] = useState<Aircraft[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; model: string } | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -71,20 +73,19 @@ const AircraftSetup = () => {
   };
 
   const handleDelete = async (id: string, model: string) => {
-    if (!window.confirm(`Are you sure you want to delete aircraft "${model}"?`)) return;
+    setDeleteTarget({ id, model });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/aircrafts/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      if (res.ok) {
-        setData(prev => prev.filter(item => item.id !== id));
-        toast.success("Aircraft deleted");
-      } else {
-        toast.error("Failed to delete aircraft");
-      }
+      await api.aircrafts.delete(deleteTarget.id);
+      setData(prev => prev.filter(item => item.id !== deleteTarget.id));
+      toast.success("Aircraft deleted");
     } catch {
       toast.error("Failed to delete aircraft");
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -141,6 +142,15 @@ const AircraftSetup = () => {
   return (
     <div className="w-full pb-10">
       <PageHeader />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Aircraft"
+        description={`Are you sure you want to delete "${deleteTarget?.model}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       <div className="bg-white border rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">

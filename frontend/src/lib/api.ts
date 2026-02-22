@@ -83,6 +83,15 @@ export const api = {
             });
             await throwIfError(res);
             return res.json();
+        },
+        delete: async (id: string) => {
+            const res = await fetch(`${API_URL}/aircrafts/${id}`, {
+                method: 'DELETE',
+                headers: getHeaders()
+            });
+            await throwIfError(res);
+            // 204 No Content has no body — return ok flag
+            return res.status === 204 ? { ok: true } : res.json();
         }
     },
     components: {
@@ -99,6 +108,14 @@ export const api = {
             });
             await throwIfError(res);
             return res.json();
+        },
+        delete: async (id: string) => {
+            const res = await fetch(`${API_URL}/components/${id}`, {
+                method: 'DELETE',
+                headers: getHeaders()
+            });
+            await throwIfError(res);
+            return res.status === 204 ? { ok: true } : res.json();
         }
     },
     aircraftComponents: {
@@ -148,6 +165,14 @@ export const api = {
             });
             await throwIfError(res);
             return res.json();
+        },
+        delete: async (id: string) => {
+            const res = await fetch(`${API_URL}/services/${id}`, {
+                method: 'DELETE',
+                headers: getHeaders()
+            });
+            await throwIfError(res);
+            return res.status === 204 ? { ok: true } : res.json();
         }
     }
 };

@@ -3,6 +3,7 @@ import { ServiceForm } from "@/components/config/ServiceForm";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -29,6 +30,7 @@ const ServiceListSetup = () => {
   const [data, setData] = useState<ServiceItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -55,21 +57,20 @@ const ServiceListSetup = () => {
     }
   }, [isCreating, editingItem]);
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to delete service "${name}"?`)) return;
+  const handleDelete = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/services/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
-      if (res.ok) {
-        setData(data.filter(item => item.id !== id));
-        toast.success("Service deleted");
-      } else {
-        toast.error("Failed to delete service");
-      }
+      await api.services.delete(deleteTarget.id);
+      setData(prev => prev.filter(item => item.id !== deleteTarget.id));
+      toast.success("Service deleted");
     } catch {
       toast.error("Failed to delete service");
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -109,6 +110,15 @@ const ServiceListSetup = () => {
         <h2 className="text-2xl font-bold tracking-tight uppercase text-[#343a40]">SERVICE LIST SETUP</h2>
         <div className="text-sm text-muted-foreground">Configuration / Service List Setup</div>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Service"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       <div className="bg-white border rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
