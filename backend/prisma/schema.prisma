@@ -49,6 +49,8 @@ model AircraftComponent {
   model               String?
   serial_number       String?
   part_number         String?
+  status              String?
+  manufacture_date    DateTime?
   last_shop_visit_date DateTime?
   hours_since_new     Float?
   cycles_since_new    Float?

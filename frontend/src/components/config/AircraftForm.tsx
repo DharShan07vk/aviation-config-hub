@@ -28,6 +28,9 @@ const APU_MANUFACTURERS = [
     "Honeywell", "Pratt & Whitney Canada", "AlliedSignal",
     "Garrett AiResearch", "HEICO", "Sundstrand", "TransDigm", "Chromalloy",
 ];
+
+const ENGINE_MANUFACTURERS = ["CFM International", "General Electric", "Rolls-Royce", "Pratt & Whitney", "IAE"];
+const ENGINE_STATUS = ["New", "Used"];
 const APU_MODELS_MAP: Record<string, string[]> = {
     "Honeywell": ["GTCP131-9A", "GTCP131-9B", "GTCP331-200", "GTCP331-350"],
     "Pratt & Whitney Canada": ["PW901A", "PW902D", "APS3200"],
@@ -78,6 +81,8 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
             flight_hours: 0,
             flight_cycles: 0,
             aircraft_received_status: "New",
+            engine1_status: "New",
+            engine2_status: "New",
             ...defaultValues,
         },
     });
@@ -94,9 +99,26 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
 
                 const componentsToInsert = [
                     {
+                        aircraft_id: aircraftId, section: "Engine 1",
+                        manufacturer: data.engine1_manufacturer, model: data.engine1_model,
+                        serial_number: data.engine1_serial_number, part_number: data.engine1_part_number,
+                        status: data.engine1_status, manufacture_date: data.engine1_manufacture_date || null,
+                        last_shop_visit_date: data.engine1_last_shop_visit || null,
+                        hours_since_new: data.engine1_hours || 0, cycles_since_new: data.engine1_cycles || 0
+                    },
+                    {
+                        aircraft_id: aircraftId, section: "Engine 2",
+                        manufacturer: data.engine2_manufacturer, model: data.engine2_model,
+                        serial_number: data.engine2_serial_number, part_number: data.engine2_part_number,
+                        status: data.engine2_status, manufacture_date: data.engine2_manufacture_date || null,
+                        last_shop_visit_date: data.engine2_last_shop_visit || null,
+                        hours_since_new: data.engine2_hours || 0, cycles_since_new: data.engine2_cycles || 0
+                    },
+                    {
                         aircraft_id: aircraftId, section: "APU",
                         manufacturer: data.apu_manufacturer, model: data.apu_model,
                         serial_number: data.apu_serial_number, part_number: data.apu_part_number,
+                        status: "N/A", manufacture_date: null,
                         last_shop_visit_date: data.apu_last_shop_visit || null,
                         hours_since_new: data.apu_hours || 0, cycles_since_new: data.apu_cycles || 0
                     },
@@ -104,6 +126,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                         aircraft_id: aircraftId, section: "Main Landing Gear Left",
                         manufacturer: data.mlg_left_manufacturer, model: data.mlg_left_model,
                         serial_number: data.mlg_left_serial_number, part_number: data.mlg_left_part_number,
+                        status: "N/A", manufacture_date: null,
                         last_shop_visit_date: data.mlg_left_shop_visit || null,
                         hours_since_new: data.mlg_left_hours || 0, cycles_since_new: data.mlg_left_cycles || 0
                     },
@@ -111,6 +134,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                         aircraft_id: aircraftId, section: "Main Landing Gear Right",
                         manufacturer: data.mlg_right_manufacturer, model: data.mlg_right_model,
                         serial_number: data.mlg_right_serial_number, part_number: data.mlg_right_part_number,
+                        status: "N/A", manufacture_date: null,
                         last_shop_visit_date: data.mlg_right_shop_visit || null,
                         hours_since_new: data.mlg_right_hours || 0, cycles_since_new: data.mlg_right_cycles || 0
                     },
@@ -118,6 +142,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                         aircraft_id: aircraftId, section: "Nose Landing Gear",
                         manufacturer: data.nlg_manufacturer, model: data.nlg_model,
                         serial_number: data.nlg_serial_number, part_number: data.nlg_part_number,
+                        status: "N/A", manufacture_date: null,
                         last_shop_visit_date: data.nlg_shop_visit || null,
                         hours_since_new: data.nlg_hours || 0, cycles_since_new: data.nlg_cycles || 0
                     },
@@ -258,6 +283,34 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
                     )} />
                     {/* spacer — keeps grid even */}
                     <div />
+
+                    {/* ── Engine 1 Details ───────────────────────────────── */}
+                    <SectionTitle title="Engine 1" />
+                    {SelectField("engine1_manufacturer", "Engine Manufacturer", ENGINE_MANUFACTURERS)}
+                    {TextField("engine1_model", "Engine Model")}
+                    {TextField("engine1_serial_number", "Serial No")}
+                    {TextField("confirm_engine1_serial_number", "Confirm Serial No")}
+                    {TextField("engine1_part_number", "Part No")}
+                    {TextField("confirm_engine1_part_number", "Confirm Part No")}
+                    {SelectField("engine1_status", "Engine Status", ENGINE_STATUS)}
+                    {TextField("engine1_manufacture_date", "Manufactured Date", "DD/MM/YYYY", "date")}
+                    {TextField("engine1_hours", "Total Hours", "HHHH-MM", "number", "0.01")}
+                    {TextField("engine1_cycles", "Total Cycles", "", "number")}
+                    <div className="col-span-2">{TextField("engine1_last_shop_visit", "Last Shop Visit", "DD/MM/YYYY", "date")}</div>
+
+                    {/* ── Engine 2 Details ───────────────────────────────── */}
+                    <SectionTitle title="Engine 2" />
+                    {SelectField("engine2_manufacturer", "Engine Manufacturer", ENGINE_MANUFACTURERS)}
+                    {TextField("engine2_model", "Engine Model")}
+                    {TextField("engine2_serial_number", "Serial No")}
+                    {TextField("confirm_engine2_serial_number", "Confirm Serial No")}
+                    {TextField("engine2_part_number", "Part No")}
+                    {TextField("confirm_engine2_part_number", "Confirm Part No")}
+                    {SelectField("engine2_status", "Engine Status", ENGINE_STATUS)}
+                    {TextField("engine2_manufacture_date", "Manufactured Date", "DD/MM/YYYY", "date")}
+                    {TextField("engine2_hours", "Total Hours", "HHHH-MM", "number", "0.01")}
+                    {TextField("engine2_cycles", "Total Cycles", "", "number")}
+                    <div className="col-span-2">{TextField("engine2_last_shop_visit", "Last Shop Visit", "DD/MM/YYYY", "date")}</div>
 
                     {/* ── APU Details ───────────────────────────────── */}
                     <SectionTitle title="APU Details" />

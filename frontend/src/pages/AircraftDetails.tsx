@@ -48,6 +48,8 @@ const AircraftDetails = () => {
     const mlgLeft = getComponent("Main Landing Gear Left");
     const mlgRight = getComponent("Main Landing Gear Right");
     const nlg = getComponent("Nose Landing Gear");
+    const engine1 = getComponent("Engine 1");
+    const engine2 = getComponent("Engine 2");
 
     const DetailSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
         <div className="space-y-4 border rounded-lg p-6 bg-card text-card-foreground shadow-sm">
@@ -98,6 +100,44 @@ const AircraftDetails = () => {
                     <DetailItem label="Aircraft Cycles" value={aircraft.flight_cycles} />
                     <DetailItem label="No. of Engines" value={aircraft.engines_count} />
                     <DetailItem label="Status" value={aircraft.status} />
+                </DetailSection>
+
+                {/* Engine 1 Details */}
+                <DetailSection title="Engine 1">
+                    <DetailItem label="Engine Manufacturer" value={engine1.manufacturer} />
+                    <DetailItem label="Engine Model" value={engine1.model} />
+                    <DetailItem label="Serial No" value={engine1.serial_number} />
+                    <DetailItem label="Part No" value={engine1.part_number} />
+                    <DetailItem label="Engine Status" value={engine1.status} />
+                    <DetailItem
+                        label="Manufactured Date"
+                        value={engine1.manufacture_date ? format(new Date(engine1.manufacture_date), "dd/MM/yyyy") : "-"}
+                    />
+                    <DetailItem label="Total Hours" value={engine1.hours_since_new} />
+                    <DetailItem label="Total Cycles" value={engine1.cycles_since_new} />
+                    <DetailItem
+                        label="Last Shop Visit"
+                        value={engine1.last_shop_visit_date ? format(new Date(engine1.last_shop_visit_date), "dd/MM/yyyy") : "-"}
+                    />
+                </DetailSection>
+
+                {/* Engine 2 Details */}
+                <DetailSection title="Engine 2">
+                    <DetailItem label="Engine Manufacturer" value={engine2.manufacturer} />
+                    <DetailItem label="Engine Model" value={engine2.model} />
+                    <DetailItem label="Serial No" value={engine2.serial_number} />
+                    <DetailItem label="Part No" value={engine2.part_number} />
+                    <DetailItem label="Engine Status" value={engine2.status} />
+                    <DetailItem
+                        label="Manufactured Date"
+                        value={engine2.manufacture_date ? format(new Date(engine2.manufacture_date), "dd/MM/yyyy") : "-"}
+                    />
+                    <DetailItem label="Total Hours" value={engine2.hours_since_new} />
+                    <DetailItem label="Total Cycles" value={engine2.cycles_since_new} />
+                    <DetailItem
+                        label="Last Shop Visit"
+                        value={engine2.last_shop_visit_date ? format(new Date(engine2.last_shop_visit_date), "dd/MM/yyyy") : "-"}
+                    />
                 </DetailSection>
 
                 {/* APU Details */}

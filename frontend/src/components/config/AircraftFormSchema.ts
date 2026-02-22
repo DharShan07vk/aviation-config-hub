@@ -32,6 +32,32 @@ export const aircraftSchema = z.object({
     aircraft_received_status: z.enum(["New", "Used"]).default("New"),
     status: z.enum(["Active", "Inactive", "Maintenance", "Storage", "Pending", "Declined"]).default("Pending"),
 
+    // Section: Engine 1
+    engine1_manufacturer: optionalString,
+    engine1_model: optionalString,
+    engine1_serial_number: optionalString,
+    confirm_engine1_serial_number: optionalString,
+    engine1_part_number: optionalString,
+    confirm_engine1_part_number: optionalString,
+    engine1_status: z.enum(["New", "Used", "N/A"]).optional(),
+    engine1_manufacture_date: z.string().optional(),
+    engine1_hours: z.coerce.number().optional(),
+    engine1_cycles: z.coerce.number().optional(),
+    engine1_last_shop_visit: z.string().optional(),
+
+    // Section: Engine 2
+    engine2_manufacturer: optionalString,
+    engine2_model: optionalString,
+    engine2_serial_number: optionalString,
+    confirm_engine2_serial_number: optionalString,
+    engine2_part_number: optionalString,
+    confirm_engine2_part_number: optionalString,
+    engine2_status: z.enum(["New", "Used", "N/A"]).optional(),
+    engine2_manufacture_date: z.string().optional(),
+    engine2_hours: z.coerce.number().optional(),
+    engine2_cycles: z.coerce.number().optional(),
+    engine2_last_shop_visit: z.string().optional(),
+
     // Section B: APU Details
     apu_manufacturer: optionalString,
     apu_model: optionalString,
@@ -83,6 +109,22 @@ export const aircraftSchema = z.object({
     .refine((data) => data.registration_number === data.confirm_registration_number, {
         message: "Registration ID must match",
         path: ["confirm_registration_number"],
+    })
+    .refine((data) => !data.engine1_serial_number || data.engine1_serial_number === data.confirm_engine1_serial_number, {
+        message: "Engine 1 Serial Number must match",
+        path: ["confirm_engine1_serial_number"],
+    })
+    .refine((data) => !data.engine1_part_number || data.engine1_part_number === data.confirm_engine1_part_number, {
+        message: "Engine 1 Part Number must match",
+        path: ["confirm_engine1_part_number"],
+    })
+    .refine((data) => !data.engine2_serial_number || data.engine2_serial_number === data.confirm_engine2_serial_number, {
+        message: "Engine 2 Serial Number must match",
+        path: ["confirm_engine2_serial_number"],
+    })
+    .refine((data) => !data.engine2_part_number || data.engine2_part_number === data.confirm_engine2_part_number, {
+        message: "Engine 2 Part Number must match",
+        path: ["confirm_engine2_part_number"],
     })
     .refine((data) => !data.apu_serial_number || data.apu_serial_number === data.confirm_apu_serial_number, {
         message: "APU Serial Number must match",
