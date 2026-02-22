@@ -21,7 +21,7 @@ export const aircraftSchema = z.object({
     model: requiredString,
     msn: requiredString,
     confirm_msn: requiredString,
-    country: requiredString,
+    country: z.string().optional(),
     registration_number: requiredString,
     confirm_registration_number: requiredString,
     manufacture_date: z.string().optional(),
@@ -29,6 +29,7 @@ export const aircraftSchema = z.object({
     flight_hours: z.coerce.number().min(0),
     flight_cycles: z.coerce.number().min(0),
     engines_count: z.coerce.number().min(1),
+    aircraft_received_status: z.enum(["New", "Used"]).default("New"),
     status: z.enum(["Active", "Inactive", "Maintenance", "Storage", "Pending", "Declined"]).default("Pending"),
 
     // Section B: APU Details

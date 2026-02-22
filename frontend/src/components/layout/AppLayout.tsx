@@ -10,7 +10,7 @@ const AppLayout = () => (
       <Header />
       <Navbar />
     </div>
-    <main className="flex-1 p-6 w-full max-w-full">
+    <main className="flex-1 p-6 w-full max-w-7xl mx-auto">
       <Outlet />
     </main>
     <Footer />

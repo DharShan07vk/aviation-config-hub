@@ -1,6 +1,8 @@
 const Footer = () => (
-  <footer className="border-t bg-card px-4 py-3 text-center text-xs text-muted-foreground">
-    © {new Date().getFullYear()} Aerotrend.
+  <footer className="border-t bg-card py-3 text-xs text-muted-foreground">
+    <div className="max-w-7xl mx-auto px-4 text-center">
+      © {new Date().getFullYear()} Aerotrend.
+    </div>
   </footer>
 );
 

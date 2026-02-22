@@ -57,87 +57,89 @@ const Header = () => {
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "AT";
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-card px-4 shadow-sm">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-            <img src={img} alt="Logo" className="h-8 w-8" />
+    <header className="h-16 border-b bg-card shadow-sm">
+      <div className="flex h-full max-w-7xl mx-auto items-center justify-between px-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+              <img src={img} alt="Logo" className="h-8 w-8" />
+            </div>
+            <span className="text-2xl font-semibold text-foreground text-[#343a40]">AEROTREND</span>
           </div>
-          <span className="text-2xl font-semibold text-foreground text-[#343a40]">AEROTREND</span>
+
+          <div className="hidden md:flex items-center ml-4">
+            <div className="relative w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input placeholder={t("search")} className="pl-9 h-9" />
+            </div>
+          </div>
         </div>
 
-        <div className="hidden md:flex items-center ml-4">
-          <div className="relative w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder={t("search")} className="pl-9 h-9" />
-          </div>
+        <div className="flex items-center gap-4">
+          <span className="hidden text-sm text-muted-foreground md:inline">
+            {format(dateTime, "MM/dd/yyyy, hh:mm:ss a")}
+          </span>
+          {/* Language Switcher */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="w-9 h-9">
+                <span className={`fi text-xl ${i18n.language === 'en' ? 'fi-my' :
+                  i18n.language === 'es' ? 'fi-es' :
+                    i18n.language === 'de' ? 'fi-de' :
+                      i18n.language === 'ru' ? 'fi-ru' :
+                        i18n.language === 'it' ? 'fi-it' : 'fi-un'
+                  }`} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => changeLanguage('en')}>
+                <span className="mr-2 fi fi-my"></span> English (Malaysia)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLanguage('es')}>
+                <span className="mr-2 fi fi-es"></span> Espagnol
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLanguage('de')}>
+                <span className="mr-2 fi fi-de"></span> Deutsch
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLanguage('ru')}>
+                <span className="mr-2 fi fi-ru"></span> Russian
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLanguage('it')}>
+                <span className="mr-2 fi fi-it"></span> Italian
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <button
+            onClick={toggleFullScreen}
+            className="p-2 text-muted-foreground hover:text-foreground focus:outline-none"
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? (
+              <Minimize className="h-5 w-5" />
+            ) : (
+              <Maximize className="h-5 w-5" />
+            )}
+          </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="h-8 w-8 cursor-pointer">
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="text-xs text-muted-foreground" disabled>
+                {user?.email}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={signOut}>
+                <LogOut className="mr-2 h-4 w-4" /> {t("sign_out")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </div>
-
-      <div className="flex items-center gap-4">
-        <span className="hidden text-sm text-muted-foreground md:inline">
-          {format(dateTime, "MM/dd/yyyy, hh:mm:ss a")}
-        </span>
-        {/* Language Switcher */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="w-9 h-9">
-              <span className={`fi text-xl ${i18n.language === 'en' ? 'fi-my' :
-                i18n.language === 'es' ? 'fi-es' :
-                  i18n.language === 'de' ? 'fi-de' :
-                    i18n.language === 'ru' ? 'fi-ru' :
-                      i18n.language === 'it' ? 'fi-it' : 'fi-un'
-                }`} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => changeLanguage('en')}>
-              <span className="mr-2 fi fi-my"></span> English (Malaysia)
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => changeLanguage('es')}>
-              <span className="mr-2 fi fi-es"></span> Espagnol
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => changeLanguage('de')}>
-              <span className="mr-2 fi fi-de"></span> Deutsch
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => changeLanguage('ru')}>
-              <span className="mr-2 fi fi-ru"></span> Russian
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => changeLanguage('it')}>
-              <span className="mr-2 fi fi-it"></span> Italian
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <button
-          onClick={toggleFullScreen}
-          className="p-2 text-muted-foreground hover:text-foreground focus:outline-none"
-          title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-        >
-          {isFullscreen ? (
-            <Minimize className="h-5 w-5" />
-          ) : (
-            <Maximize className="h-5 w-5" />
-          )}
-        </button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Avatar className="h-8 w-8 cursor-pointer">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem className="text-xs text-muted-foreground" disabled>
-              {user?.email}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" /> {t("sign_out")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </header>
   );

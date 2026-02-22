@@ -75,6 +75,9 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
         defaultValues: {
             status: "Pending",
             engines_count: 2,
+            flight_hours: 0,
+            flight_cycles: 0,
+            aircraft_received_status: "New",
             ...defaultValues,
         },
     });
@@ -219,7 +222,7 @@ export function AircraftForm({ defaultValues, onSuccess }: AircraftFormProps) {
 
                     {/* ── Aircraft Setup fields ─────────────────────── */}
                     {SelectField("model", "Aircraft Model", AIRCRAFT_MODELS)}
-                    {SelectField("status", "Aircraft Received Status",
+                    {SelectField("aircraft_received_status", "Aircraft Received Status",
                         ["New", "Used"])}
 
                     {TextField("msn", "MSN")}

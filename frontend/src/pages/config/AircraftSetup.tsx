@@ -128,6 +128,7 @@ const AircraftSetup = () => {
                 ? {
                   ...editingAircraft,
                   status: (editingAircraft.status as StatusUnion) ?? "Pending",
+                  aircraft_received_status: (editingAircraft.aircraft_received_status as "New" | "Used") ?? "New",
                 }
                 : undefined
             }
