@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -9,7 +8,6 @@ import {
     FormField,
     FormItem,
     FormLabel,
-    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,25 +25,18 @@ import { useNavigate } from "react-router-dom";
 import { MultiSelect, Option } from "@/components/ui/multi-select";
 
 const ZONE_OPTIONS: Option[] = [
-    { label: "100 - Lower Half of Fuselage", value: "100" },
-    { label: "200 - Upper Half of Fuselage", value: "200" },
-    { label: "300 - Stabilizers", value: "300" },
-    { label: "400 - Nacelles and Pylons", value: "400" },
-    { label: "500 - Wings", value: "500" },
-    { label: "600 - Landing Gear", value: "600" },
-    { label: "700 - Landing Gear Doors", value: "700" },
-    { label: "800 - Doors", value: "800" },
+    { label: "Zone 1", value: "Zone 1" },
+    { label: "Zone 2", value: "Zone 2" },
+    { label: "Zone 3", value: "Zone 3" },
 ];
 
 const AIRCRAFT_MODELS = [
-    "B737-700",
-    "B737-800",
-    "B737-900",
-    "B737-900ER",
-    "A320-200",
-    "ATR72-500",
-    "ATR72-600",
+    "B737-700", "B737-800", "B737-900", "B737-900ER",
+    "A320-200", "ATR72-500", "ATR72-600",
 ];
+
+const CURRENCIES = ["MYR", "USD", "EUR"];
+const UNIT_OPTIONS = ["Hour", "Cycle"];
 
 interface ServiceFormProps {
     defaultValues?: any;
@@ -59,19 +50,20 @@ export function ServiceForm({ defaultValues, onSuccess }: ServiceFormProps) {
 
     const form = useForm<ServiceFormData>({
         resolver: zodResolver(serviceSchema),
+        mode: "onBlur",
         defaultValues: {
             zones: [],
+            currency: "MYR",
+            interval_threshold_unit: "Hour",
+            repeat_interval_unit: "Hour",
             ...defaultValues,
         },
     });
 
-    useEffect(() => {
-        fetchFormData();
-    }, []);
+    useEffect(() => { fetchFormData(); }, []);
 
     const fetchFormData = async () => {
         try {
-            // Fetch Components for assignment
             const componentsData = await api.components.list();
             if (componentsData) setComponents(componentsData);
         } catch (error) {
@@ -83,10 +75,9 @@ export function ServiceForm({ defaultValues, onSuccess }: ServiceFormProps) {
         setLoading(true);
         try {
             if (defaultValues?.id) {
-                // Edit mode — PATCH
                 const res = await fetch(`http://localhost:3000/api/services/${defaultValues.id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
                     body: JSON.stringify(data),
                 });
                 if (!res.ok) throw await res.json();
@@ -97,14 +88,15 @@ export function ServiceForm({ defaultValues, onSuccess }: ServiceFormProps) {
                     task_name: data.task_name,
                     mpd_amm_task_ids: data.mpd_amm_task_ids || null,
                     task_card_ref: data.task_card_ref || null,
-                    description: data.description || null,
                     assigned_component_id: data.assigned_component_id || null,
                     zones: data.zones,
                     estimated_manhours: data.estimated_manhours || null,
                     estimated_price: data.estimated_price || null,
                     quotation_price: data.quotation_price || null,
                     interval_threshold: data.interval_threshold || null,
+                    interval_threshold_unit: data.interval_threshold_unit || null,
                     repeat_interval: data.repeat_interval || null,
+                    repeat_interval_unit: data.repeat_interval_unit || null,
                 });
                 toast.success("Service saved successfully");
             }
@@ -118,121 +110,123 @@ export function ServiceForm({ defaultValues, onSuccess }: ServiceFormProps) {
         }
     }
 
+    /* ── Shared style helpers (matches ComponentForm pattern) ── */
+    const labelCls = (hasError: boolean) =>
+        `w-44 shrink-0 text-sm font-medium leading-tight ${hasError ? "text-red-500" : "text-gray-600"}`;
+
+    const inputCls = (hasError: boolean) =>
+        `h-9 text-sm ${hasError ? "border-red-500 focus-visible:ring-red-300 pr-7" : "border-gray-300"}`;
+
+    const selectCls = (hasError: boolean) =>
+        `h-9 text-sm ${hasError ? "border-red-500" : "border-gray-300"}`;
+
+    const ErrorBadge = () => (
+        <span className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center pointer-events-none select-none">!</span>
+    );
+
+    const SelectErrorBadge = () => (
+        <span className="absolute right-8 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center pointer-events-none select-none">!</span>
+    );
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="aircraft_model"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Aircraft Model</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select aircraft model" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {AIRCRAFT_MODELS.map((model) => (
-                                                    <SelectItem key={model} value={model}>
-                                                        {model}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="flex flex-col gap-5">
 
-                    <FormField
-                        control={form.control}
-                        name="task_name"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Task Name</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="mpd_amm_task_ids"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">MPD/AMM Task IDs</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="task_card_ref"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Task Card Ref</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="assigned_component_id"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Assigned Component</FormLabel>
-                                <div className="col-span-3">
+                    {/* Aircraft Model */}
+                    <FormField control={form.control} name="aircraft_model" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Aircraft Model</FormLabel>
+                                <div className="relative flex-1">
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
-                                            <SelectTrigger>
+                                            <SelectTrigger className={selectCls(!!fieldState.error)}>
+                                                <SelectValue placeholder="Select aircraft model" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {AIRCRAFT_MODELS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                    {fieldState.error && <SelectErrorBadge />}
+                                </div>
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Aircraft Model</p>}
+                        </FormItem>
+                    )} />
+
+                    {/* Task Name */}
+                    <FormField control={form.control} name="task_name" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Task Name</FormLabel>
+                                <div className="relative flex-1">
+                                    <FormControl><Input className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                    {fieldState.error && <ErrorBadge />}
+                                </div>
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Task Name</p>}
+                        </FormItem>
+                    )} />
+
+                    {/* MPD/AMM Task IDs */}
+                    <FormField control={form.control} name="mpd_amm_task_ids" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>MPD/AMM Task IDs</FormLabel>
+                                <div className="relative flex-1">
+                                    <FormControl><Input className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                    {fieldState.error && <ErrorBadge />}
+                                </div>
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter MPD/AMM Task IDs</p>}
+                        </FormItem>
+                    )} />
+
+                    {/* Task Card Ref */}
+                    <FormField control={form.control} name="task_card_ref" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Task Card Ref</FormLabel>
+                                <div className="relative flex-1">
+                                    <FormControl><Input className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                    {fieldState.error && <ErrorBadge />}
+                                </div>
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Task Card Ref</p>}
+                        </FormItem>
+                    )} />
+
+                    {/* Assigned Component */}
+                    <FormField control={form.control} name="assigned_component_id" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Assigned Component</FormLabel>
+                                <div className="relative flex-1">
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger className={selectCls(!!fieldState.error)}>
                                                 <SelectValue placeholder="Select component" />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {components.map((comp) => (
-                                                <SelectItem key={comp.id} value={comp.id}>
-                                                    {comp.name}
-                                                </SelectItem>
-                                            ))}
+                                            {components.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
-                                    <FormMessage />
+                                    {fieldState.error && <SelectErrorBadge />}
                                 </div>
-                            </FormItem>
-                        )}
-                    />
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Assigned Component</p>}
+                        </FormItem>
+                    )} />
 
-                    <FormField
-                        control={form.control}
-                        name="zones"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Zones</FormLabel>
-                                <div className="col-span-3">
+                    {/* Zones */}
+                    <FormField control={form.control} name="zones" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Zones</FormLabel>
+                                <div className="relative flex-1">
                                     <FormControl>
                                         <MultiSelect
                                             options={ZONE_OPTIONS}
@@ -241,115 +235,138 @@ export function ServiceForm({ defaultValues, onSuccess }: ServiceFormProps) {
                                             placeholder="Select zones"
                                         />
                                     </FormControl>
-                                    <FormMessage />
                                 </div>
-                            </FormItem>
-                        )}
-                    />
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Zones</p>}
+                        </FormItem>
+                    )} />
 
-                    <FormField
-                        control={form.control}
-                        name="estimated_manhours"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Estimated Manhours</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input type="number" step="0.1" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
+                    {/* Estimated Manhours */}
+                    <FormField control={form.control} name="estimated_manhours" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Estimated Manhours</FormLabel>
+                                <div className="relative flex-1">
+                                    <FormControl><Input type="number" step="0.1" className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                    {fieldState.error && <ErrorBadge />}
                                 </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="estimated_price"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Estimated Price</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input type="number" step="0.01" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="quotation_price"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Quotation Price</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input type="number" step="0.01" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="interval_threshold"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Interval Threshold (Hours)</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="repeat_interval"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Repeat Interval (Hours)</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Input type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </div>
-                            </FormItem>
-                        )}
-                    />
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Estimated Manhours</p>}
+                        </FormItem>
+                    )} />
 
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem className="grid grid-cols-4 items-center gap-4 space-y-0">
-                                <FormLabel className="text-right">Description</FormLabel>
-                                <div className="col-span-3">
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder="Enter service description..."
-                                            className="resize-none"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
+                    {/* Estimated Price with inline currency */}
+                    <FormField control={form.control} name="estimated_price" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Comp Price</FormLabel>
+                                <div className="flex gap-2 flex-1">
+                                    <FormField control={form.control} name="currency" render={({ field: cf }) => (
+                                        <Select onValueChange={cf.onChange} value={cf.value as string}>
+                                            <SelectTrigger className="w-24 shrink-0 h-9 text-sm border-gray-300">
+                                                <SelectValue placeholder="CCY" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    )} />
+                                    <div className="relative flex-1">
+                                        <FormControl><Input type="number" step="0.01" className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                        {fieldState.error && <ErrorBadge />}
+                                    </div>
                                 </div>
-                            </FormItem>
-                        )}
-                    />
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Comp Price</p>}
+                        </FormItem>
+                    )} />
+
+                    {/* Quotation Price with inline currency */}
+                    <FormField control={form.control} name="quotation_price" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Service Price</FormLabel>
+                                <div className="flex gap-2 flex-1">
+                                    <FormField control={form.control} name="currency" render={({ field: cf }) => (
+                                        <Select onValueChange={cf.onChange} value={cf.value as string}>
+                                            <SelectTrigger className="w-24 shrink-0 h-9 text-sm border-gray-300">
+                                                <SelectValue placeholder="CCY" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    )} />
+                                    <div className="relative flex-1">
+                                        <FormControl><Input type="number" step="0.01" className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                        {fieldState.error && <ErrorBadge />}
+                                    </div>
+                                </div>
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Service Price</p>}
+                        </FormItem>
+                    )} />
+
+                    {/* Interval Threshold */}
+                    <FormField control={form.control} name="interval_threshold" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Interval Threshold</FormLabel>
+                                <div className="flex gap-2 flex-1">
+                                    <FormField control={form.control} name="interval_threshold_unit" render={({ field: uf }) => (
+                                        <Select onValueChange={uf.onChange} value={uf.value as string}>
+                                            <SelectTrigger className="w-24 shrink-0 h-9 text-sm border-gray-300">
+                                                <SelectValue placeholder="Unit" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {UNIT_OPTIONS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    )} />
+                                    <div className="relative flex-1">
+                                        <FormControl><Input type="number" className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                        {fieldState.error && <ErrorBadge />}
+                                    </div>
+                                </div>
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Interval Threshold</p>}
+                        </FormItem>
+                    )} />
+
+                    {/* Repeat Interval */}
+                    <FormField control={form.control} name="repeat_interval" render={({ field, fieldState }) => (
+                        <FormItem className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-3">
+                                <FormLabel className={labelCls(!!fieldState.error)}>Repeat Interval</FormLabel>
+                                <div className="flex gap-2 flex-1">
+                                    <FormField control={form.control} name="repeat_interval_unit" render={({ field: uf }) => (
+                                        <Select onValueChange={uf.onChange} value={uf.value as string}>
+                                            <SelectTrigger className="w-24 shrink-0 h-9 text-sm border-gray-300">
+                                                <SelectValue placeholder="Unit" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {UNIT_OPTIONS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    )} />
+                                    <div className="relative flex-1">
+                                        <FormControl><Input type="number" className={inputCls(!!fieldState.error)} {...field} /></FormControl>
+                                        {fieldState.error && <ErrorBadge />}
+                                    </div>
+                                </div>
+                            </div>
+                            {fieldState.error && <p className="text-xs text-red-500 ml-[11.5rem]">Enter Repeat Interval</p>}
+                        </FormItem>
+                    )} />
+
                 </div>
 
-                <div className="flex justify-end space-x-4">
+                <div className="flex justify-end gap-4 pt-6 border-t mt-6">
                     <Button variant="outline" type="button" onClick={() => onSuccess ? onSuccess() : navigate("/config/services")}>
                         ← Back
                     </Button>
-                    <Button type="submit" disabled={loading}>
-                        {loading ? "Saving..." : defaultValues?.id ? "Update Service" : "Save Service"}
+                    <Button type="submit" disabled={loading} className="bg-[#556ee6] hover:bg-[#4a5fcc] text-white px-10 h-10">
+                        {loading ? "Saving..." : defaultValues?.id ? "Update Service" : "Save Configuration"}
                     </Button>
                 </div>
             </form>

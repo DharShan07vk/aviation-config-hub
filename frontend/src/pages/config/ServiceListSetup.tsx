@@ -86,15 +86,15 @@ const ServiceListSetup = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">
-              {editingItem ? "Edit Service" : "Add New Service"}
+              {editingItem ? "Edit Service" : "SERVICE LIST SETUP"}
             </h2>
-            <p className="text-muted-foreground text-sm mt-1">Define maintenance tasks and services.</p>
+            {/* <p className="text-muted-foreground text-sm mt-1">Define maintenance tasks and services.</p> */}
           </div>
           <Button variant="outline" onClick={() => { setIsCreating(false); setEditingItem(null); }}>
             ← Back to List
           </Button>
         </div>
-        <div className="border rounded-lg p-6 bg-card text-card-foreground shadow-sm">
+        <div className="border rounded-lg p-8 bg-white shadow-sm max-w-7xl mx-auto">
           <ServiceForm
             defaultValues={editingItem ?? undefined}
             onSuccess={() => { setIsCreating(false); setEditingItem(null); fetchData(); }}
@@ -140,33 +140,37 @@ const ServiceListSetup = () => {
           <Table>
             <TableHeader className="bg-gray-50">
               <TableRow>
-                <TableHead className="w-[50px]"><input type="checkbox" className="translate-y-[2px]" /></TableHead>
                 <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Task Name</TableHead>
                 <TableHead>Aircraft Model</TableHead>
-                <TableHead>MPD/AMM Task IDs</TableHead>
+                <TableHead>Task</TableHead>
+                <TableHead>MPD Task ID</TableHead>
                 <TableHead>Task Card Ref</TableHead>
+                <TableHead>Zone</TableHead>
+                <TableHead>Comp Price</TableHead>
+                <TableHead>Service Price</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">Loading...</TableCell>
+                  <TableCell colSpan={9} className="text-center h-24 text-muted-foreground">Loading...</TableCell>
                 </TableRow>
               ) : filteredData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">No results found.</TableCell>
+                  <TableCell colSpan={9} className="text-center h-24 text-muted-foreground">No results found.</TableCell>
                 </TableRow>
               ) : (
                 filteredData.map((item, index) => (
                   <TableRow key={item.id || index}>
-                    <TableCell><input type="checkbox" className="translate-y-[2px]" /></TableCell>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell className="font-medium">{item.task_name}</TableCell>
                     <TableCell>{item.aircraft_model}</TableCell>
+                    <TableCell className="font-medium">{item.task_name}</TableCell>
                     <TableCell>{item.mpd_amm_task_ids || '-'}</TableCell>
                     <TableCell>{item.task_card_ref || '-'}</TableCell>
+                    <TableCell>{Array.isArray(item.zones) ? item.zones.join(', ') : (item.zones || '-')}</TableCell>
+                    <TableCell>{item.estimated_price != null ? item.estimated_price : '-'}</TableCell>
+                    <TableCell>{item.quotation_price != null ? item.quotation_price : '-'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
