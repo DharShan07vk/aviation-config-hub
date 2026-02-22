@@ -49,10 +49,15 @@ export function AircraftTable() {
         try {
             setLoading(true);
             const data = await api.aircrafts.list();
-            setData(data || []);
-        } catch (error) {
+            setData(Array.isArray(data) ? data : []);
+        } catch (error: any) {
             console.error("Error fetching aircraft:", error);
-            toast.error("Failed to fetch aircraft data");
+            if (error?.status === 403 || error?.error?.toLowerCase().includes("unauth") || error?.error?.toLowerCase().includes("forbidden")) {
+                toast.error("Session expired. Please log in again.");
+            } else {
+                toast.error("Failed to fetch aircraft data");
+            }
+            setData([]);
         } finally {
             setLoading(false);
         }

@@ -38,6 +38,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkUser = async () => {
     try {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      if (!token || !storedUser) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
       const user = await api.auth.getUser();
       setUser(user);
     } catch (e) {

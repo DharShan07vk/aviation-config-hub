@@ -10,6 +10,22 @@ const getHeaders = () => {
     };
 };
 
+// On 401/403: clear stale auth and redirect to login
+const handleUnauthorized = (status: number) => {
+    if (status === 401 || status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+    }
+};
+
+const throwIfError = async (res: Response) => {
+    if (!res.ok) {
+        handleUnauthorized(res.status);
+        throw await res.json();
+    }
+};
+
 export const api = {
     auth: {
         login: async (credentials: any) => {
@@ -31,9 +47,6 @@ export const api = {
             return res.json();
         },
         getUser: async () => {
-            // Since we are moving away from Supabase, we might not have a /user endpoint or it's handled by token
-            // For now return null or validation of token?
-            // We will store user in localStorage on login
             const userStr = localStorage.getItem('user');
             return userStr ? JSON.parse(userStr) : null;
         },
@@ -49,16 +62,17 @@ export const api = {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         },
         list: async () => {
             const res = await fetch(`${API_URL}/aircrafts`, { headers: getHeaders() });
+            await throwIfError(res);
             return res.json();
         },
         get: async (id: string) => {
             const res = await fetch(`${API_URL}/aircrafts/${id}`, { headers: getHeaders() });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         },
         update: async (id: string, data: any) => {
@@ -67,13 +81,14 @@ export const api = {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         }
     },
     components: {
         list: async () => {
             const res = await fetch(`${API_URL}/components`, { headers: getHeaders() });
+            await throwIfError(res);
             return res.json();
         },
         create: async (data: any) => {
@@ -82,7 +97,7 @@ export const api = {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         }
     },
@@ -93,11 +108,12 @@ export const api = {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         },
         getForAircraft: async (id: string) => {
             const res = await fetch(`${API_URL}/aircraft_components/${id}`, { headers: getHeaders() });
+            await throwIfError(res);
             return res.json();
         },
         update: async (componentId: string, data: any) => {
@@ -106,7 +122,7 @@ export const api = {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         },
         delete: async (componentId: string) => {
@@ -114,13 +130,14 @@ export const api = {
                 method: 'DELETE',
                 headers: getHeaders()
             });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         }
     },
     services: {
         list: async () => {
             const res = await fetch(`${API_URL}/services`, { headers: getHeaders() });
+            await throwIfError(res);
             return res.json();
         },
         create: async (data: any) => {
@@ -129,7 +146,7 @@ export const api = {
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!res.ok) throw await res.json();
+            await throwIfError(res);
             return res.json();
         }
     }
